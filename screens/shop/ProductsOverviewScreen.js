@@ -21,7 +21,6 @@ const ProductsOverviewScreen = ({ navigation }) => {
                     title={itemData.item.title}
                     price={itemData.item.price}
                     onViewDetail={() => {
-                        console.log('Product')
                         navigation.navigate('ProductDetail', {
                             productId: itemData.item.id,
                             productTitle: itemData.item.title,
@@ -36,15 +35,19 @@ const ProductsOverviewScreen = ({ navigation }) => {
     );
 };
 
-ProductsOverviewScreen.navigationOptions = {
-    headerTitle: 'All Products',
-    headerRight: <HeaderButtons HeaderButtonComponent={HeaderButton}>
+ProductsOverviewScreen.navigationOptions = navData => {
+    return {
+        headerTitle: 'All Products',
+        headerRight: <HeaderButtons HeaderButtonComponent={HeaderButton}>
             <Item
                 title="Cart"
                 iconName={Platform.OS === 'android' ? 'md-cart' : 'ios-cart'}
-                onPress={() => {}}
+                onPress={() => {
+                    navData.navigation.navigate('Cart')
+                }}
             />
         </HeaderButtons>
+    }
 };
 
 export default ProductsOverviewScreen;
