@@ -6,7 +6,6 @@ import Colors from "../../constants/Colors";
 import CartItem from "../../components/shop/CartItem";
 import * as cartActions from "../../store/actions/cart";
 import * as ordersActions from "../../store/actions/orders";
-import OrdersScreen from "./OrdersScreen";
 
 const CartScreen = () => {
     const cartTotalAmount = useSelector(state => state.cart.totalAmount);
@@ -53,6 +52,7 @@ const CartScreen = () => {
                             quantity={itemData.item.quantity}
                             title={itemData.item.productTitle}
                             amount={itemData.item.sum}
+                            deletable
                             onRemove={() => {
                                 dispatch(cartActions.removeFromCart(itemData.item.productId));
                             }}
