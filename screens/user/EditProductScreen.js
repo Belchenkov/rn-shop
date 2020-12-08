@@ -7,6 +7,7 @@ import HeaderButton from "../../components/UI/HeaderButton";
 import * as productsActions from '../../store/actions/products';
 
 const EditProductScreen = ({ navigation }) => {
+    const dispatch = useDispatch();
     const prodId = navigation.getParam('productId');
     const editedProduct = useSelector(
         state => state.products.userProducts.find(prod => prod.id === prodId)
@@ -15,8 +16,6 @@ const EditProductScreen = ({ navigation }) => {
     const [imageUrl, setImageUrl] = useState(editedProduct?.imageUrl || '');
     const [price, setPrice] = useState(editedProduct?.price || null);
     const [description, setDescription] = useState(editedProduct?.description || '');
-
-    const dispatch = useDispatch();
 
     const submitHandler = useCallback(() => {
         if (editedProduct) {
@@ -34,6 +33,8 @@ const EditProductScreen = ({ navigation }) => {
                 +price
             ));
         }
+
+        navigation.goBack();
     }, [dispatch, prodId, title, description, imageUrl, price]);
 
     useEffect(() => {
