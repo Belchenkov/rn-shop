@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import { createStore, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
 import { AppLoading } from 'expo';

@@ -4,15 +4,14 @@ import {
     Text,
     Image,
     StyleSheet,
-    Button,
     TouchableOpacity,
     TouchableNativeFeedback,
     Platform
 } from 'react-native';
 
-import Colors from "../../constants/Colors";
+import Card from "../UI/Card";
 
-const ProductItem = ({ onViewDetail, onAddToCart, image, title, price }) => {
+const ProductItem = ({ children, image, title, price, onSelect }) => {
     let TouchableCmp = TouchableOpacity;
 
     if (Platform.OS === 'android' && Platform.Version >= 21) {
@@ -20,9 +19,9 @@ const ProductItem = ({ onViewDetail, onAddToCart, image, title, price }) => {
     }
 
     return (
-            <View style={styles.product}>
+            <Card style={styles.product}>
                 <View style={styles.touchable}>
-                    <TouchableCmp onPress={onViewDetail} useForeground>
+                    <TouchableCmp onPress={onSelect} useForeground>
                         <View>
                             <View style={styles.imageContainer}>
                                 <Image style={styles.image} source={{uri: image}} />
@@ -32,35 +31,17 @@ const ProductItem = ({ onViewDetail, onAddToCart, image, title, price }) => {
                                 <Text style={styles.price}>${ price.toFixed(2) }</Text>
                             </View>
                             <View style={styles.actions}>
-                                <Button
-                                    style={styles.button}
-                                    color={Colors.primary}
-                                    onPress={onViewDetail}
-                                    title="View Details"
-                                />
-                                <Button
-                                    style={styles.button}
-                                    color={Colors.accent}
-                                    title="To Cart"
-                                    onPress={onAddToCart}
-                                />
+                                { children }
                             </View>
                         </View>
                     </TouchableCmp>
                 </View>
-            </View>
+            </Card>
     )
 };
 
 const styles = StyleSheet.create({
     product: {
-        shadowColor: 'black',
-        shadowOpacity: .26,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 8,
-        elevation: 5,
-        borderRadius: 10,
-        backgroundColor: 'white',
         height: 300,
         margin: 20,
     },
@@ -81,7 +62,7 @@ const styles = StyleSheet.create({
     },
     details: {
         alignItems: 'center',
-        height: '15%',
+        height: '17%',
         padding: 10
     },
     title: {
@@ -97,12 +78,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        height: '25%',
+        height: '23%',
         paddingHorizontal: 20
     },
-    button: {
-        borderRadius: 10
-    }
 });
 
 export default ProductItem;
