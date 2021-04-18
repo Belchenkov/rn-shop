@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from "react-redux";
-import { View, ScrollView, Text, TextInput, StyleSheet, Platform } from 'react-native';
+import { View, ScrollView, Text, TextInput, StyleSheet, Platform, Alert } from 'react-native';
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 
 import HeaderButton from "../../components/UI/HeaderButton";
@@ -13,11 +13,19 @@ const EditProductScreen = ({ navigation }) => {
         state => state.products.userProducts.find(prod => prod.id === prodId)
     );
     const [title, setTitle] = useState(editedProduct?.title || '');
+    const [titleIsValid, setTitleIsValid] = useState(false);
     const [imageUrl, setImageUrl] = useState(editedProduct?.imageUrl || '');
     const [price, setPrice] = useState(editedProduct?.price || null);
     const [description, setDescription] = useState(editedProduct?.description || '');
 
     const submitHandler = useCallback(() => {
+        if (!titleIsValid) {
+            Alert.alert('Wrong input!', 'Please check the errors in the form.', [
+                { text: 'OK' }
+            ])
+            return
+        }
+
         if (editedProduct) {
             dispatch(productsActions.updateProduct(
                 prodId,
@@ -43,6 +51,12 @@ const EditProductScreen = ({ navigation }) => {
         });
     }, [submitHandler])
 
+    const titleChangeHandler = text => {
+        text.trim().length === 0 ? setTitleIsValid(false) : setTitleIsValid(true);
+
+        setTitle(text);
+    };
+
     return (
         <ScrollView>
             <View style={styles.form}>
@@ -57,6 +71,7 @@ const EditProductScreen = ({ navigation }) => {
                         autoCorrect
                         returnKeyType='next'
                     />
+                    { !titleIsValid && <Text>Please enter a valid title!</Text> }
                 </View>
                 <View style={styles.formControl}>
                     <Text style={styles.label}>Image URL</Text>
