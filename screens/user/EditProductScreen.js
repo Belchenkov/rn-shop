@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useReducer } from 'react';
+import React, { useEffect, useCallback, useReducer } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { View, ScrollView, Text, TextInput, StyleSheet, Platform, Alert } from 'react-native';
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
@@ -98,47 +98,56 @@ const EditProductScreen = ({ navigation }) => {
     }, [submitHandler])
 
 
-    const textChangeHandler = (inputIdentifier, text) => {
-       let isValid = false;
-
-       if (text.trim().length > 0) {
-           isValid = true;
-       }
-
+    const inputChangeHandler = useCallback((inputIdentifier, inputValue, inputValidity) => {
        dispatchFormState({
            type: FORM_INPUT_UPDATE,
-           value: text,
-           isValid,
+           value: inputValue,
+           isValid: inputValidity,
            input: inputIdentifier
        });
-    };
+    }, [dispatchFormState]);
 
     return (
         <ScrollView>
             <View style={styles.form}>
                 <Input
+                    id="title"
                     label='Title'
                     errorText='Please enter a valid title!'
                     keyboardType='default'
                     autoCapitalize='sentences'
                     autoCorrect
                     returnKeyType='next'
+                    onInputChange={inputChangeHandler}
+                    initialValue={editedProduct ? editedProduct.title : ''}
+                    initiallyValid={!!editedProduct}
+                    required
                 />
                 <Input
+                    id='imageUrl'
                     label='Image URL'
                     errorText='Please enter a valid image url!'
                     keyboardType='default'
                     returnKeyType='next'
+                    onInputChange={inputChangeHandler}
+                    initialValue={editedProduct ? editedProduct.imageUrl : ''}
+                    initiallyValid={!!editedProduct}
+                    required
                 />
                 { !editedProduct && (
                     <Input
+                        id='price'
                         label='Price'
                         errorText='Please enter a valid price!'
                         keyboardType='decimal-pad'
                         returnKeyType='next'
+                        onInputChange={inputChangeHandler}
+                        required
+                        min={0.1}
                     />
                 )}
                 <Input
+                    id='description'
                     label='Description'
                     errorText='Please enter a valid description!'
                     keyboardType='default'
@@ -146,6 +155,11 @@ const EditProductScreen = ({ navigation }) => {
                     autoCorrect
                     multiline
                     numberOfLines={3}
+                    onInputChange={inputChangeHandler}
+                    initialValue={editedProduct ? editedProduct.description : ''}
+                    initiallyValid={!!editedProduct}
+                    required
+                    minLength={5}
                 />
             </View>
         </ScrollView>
