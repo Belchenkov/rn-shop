@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, FlatList, Platform, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from "react-redux";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 
-import ProductItem from "../../components/shop/ProductItem";
-import * as cartAction from '../../store/actions/cart';
-import HeaderButton from "../../components/UI/HeaderButton";
 import Colors from "../../constants/Colors";
+import ProductItem from "../../components/shop/ProductItem";
+import HeaderButton from "../../components/UI/HeaderButton";
+import * as cartAction from '../../store/actions/cart';
+import * as productsAction from '../../store/actions/products';
 
 const ProductsOverviewScreen = ({ navigation }) => {
     const products = useSelector(state => state.products.availableProducts);
@@ -18,6 +19,10 @@ const ProductsOverviewScreen = ({ navigation }) => {
             productTitle: title,
         });
     };
+
+    useEffect(() => {
+        dispatch(productsAction.fetchProducts());
+    }, [dispatch]);
 
     return (
         <FlatList

@@ -1,6 +1,39 @@
+import Product from "../../models/Product";
+
 export const DELETE_PRODUCT = 'DELETE_PRODUCT';
 export const CREATE_PRODUCT = 'CREATE_PRODUCT';
 export const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
+export const SET_PRODUCTS = 'SET_PRODUCTS';
+
+export const fetchProducts = () => {
+    return async dispatch => {
+        try {
+            const res = await fetch('https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products.json');
+            const data = await res.json();
+            const loadedProducts = [];
+
+            for(const key in data) {
+                loadedProducts.push(
+                    new Product(
+                        key,
+                        'u1',
+                        data[key].title,
+                        data[key].imageUrl,
+                        data[key].description,
+                        data[key].price,
+                    )
+                );
+            }
+
+            dispatch({
+                type: SET_PRODUCTS,
+                products: loadedProducts
+            });
+        } catch(err) {
+            console.error(error);
+        }
+    }
+};
 
 export const deleteProduct = productId => {
     return {
@@ -27,21 +60,19 @@ export const createProduct = (title, description, imageUrl, price) => {
 
             const data = await res.json();
 
-            console.log(data);
+            dispatch({
+                type: CREATE_PRODUCT,
+                productData: {
+                    id: data.name,
+                    title,
+                    description,
+                    imageUrl,
+                    price
+                }
+            });
         } catch(err) {
             console.error(error);
         }
-
-        dispatch({
-            type: CREATE_PRODUCT,
-            productData: {
-                id: data.name,
-                title,
-                description,
-                imageUrl,
-                price
-            }
-        });
     }
 };
 
