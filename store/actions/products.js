@@ -10,15 +10,39 @@ export const deleteProduct = productId => {
 };
 
 export const createProduct = (title, description, imageUrl, price) => {
-    return {
-        type: CREATE_PRODUCT,
-        productData: {
-            title,
-            description,
-            imageUrl,
-            price
+    return async dispatch => {
+        try {
+            const res = await fetch('https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products.json', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title,
+                    description,
+                    imageUrl,
+                    price
+                })
+            });
+
+            const data = await res.json();
+
+            console.log(data);
+        } catch(err) {
+            console.error(error);
         }
-    };
+
+        dispatch({
+            type: CREATE_PRODUCT,
+            productData: {
+                id: data.name,
+                title,
+                description,
+                imageUrl,
+                price
+            }
+        });
+    }
 };
 
 export const updateProduct = (id, title, description, imageUrl) => {
