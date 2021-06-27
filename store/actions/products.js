@@ -44,9 +44,13 @@ export const fetchProducts = () => {
 export const deleteProduct = productId => {
     return async dispatch => {
         try {
-            await fetch(`https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products/${productId}.json`, {
+            const res = await fetch(`https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products/${productId}.json`, {
                 method: 'DELETE'
             });
+
+            if (!res.ok) {
+                throw new Error('Something went wrong!');
+            }
 
             dispatch({
                 type: DELETE_PRODUCT,
@@ -97,7 +101,7 @@ export const createProduct = (title, description, imageUrl, price) => {
 export const updateProduct = (id, title, description, imageUrl) => {
     return async dispatch => {
         try {
-             await fetch(`https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products/${id}.json`, {
+             const res = await fetch(`https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products/${id}.json`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
@@ -108,6 +112,10 @@ export const updateProduct = (id, title, description, imageUrl) => {
                     imageUrl
                 })
             });
+
+            if (!res.ok) {
+                throw new Error('Something went wrong!');
+            }
 
             dispatch({
                 type: UPDATE_PRODUCT,

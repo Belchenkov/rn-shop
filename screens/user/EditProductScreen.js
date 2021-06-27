@@ -1,11 +1,12 @@
-import React, { useEffect, useCallback, useReducer } from 'react';
+import React, {useEffect, useCallback, useReducer, useState} from 'react';
 import { useSelector, useDispatch } from "react-redux";
-import { View, ScrollView, StyleSheet, Platform, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, Platform, Alert, ActivityIndicator, Text  } from 'react-native';
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 
 import HeaderButton from "../../components/UI/HeaderButton";
 import * as productsActions from '../../store/actions/products';
 import Input from "../../components/UI/Input";
+import Colors from "../../constants/Colors";
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 
@@ -27,7 +28,6 @@ const formReducer = (state, action) => {
         }
 
         return {
-            ...state,
             inputValues: updatedValues,
             inputValidities: updatedValidities,
             formIsValid: updatedFormIsValid
@@ -38,6 +38,8 @@ const formReducer = (state, action) => {
 };
 
 const EditProductScreen = ({ navigation }) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(false);
     const dispatch = useDispatch();
     const prodId = navigation.getParam('productId');
     const editedProduct = useSelector(
@@ -60,7 +62,15 @@ const EditProductScreen = ({ navigation }) => {
         formIsValid: !!editedProduct || false
     });
 
-    const submitHandler = useCallback(() => {
+    useEffect(() => {
+        if (error) {
+            Alert.alert('An error occurred!', [
+                { text: 'OK' }
+            ])
+        }
+    }, [error]);
+
+    const submitHandler = useCallback(async () => {
         if (!formState.formIsValid) {
             Alert.alert('Wrong input!', 'Please check the errors in the form.', [
                 { text: 'OK' }
@@ -68,23 +78,31 @@ const EditProductScreen = ({ navigation }) => {
             return
         }
 
-        if (editedProduct) {
-            dispatch(productsActions.updateProduct(
-                prodId,
-                formState.inputValues.title,
-                formState.inputValues.description,
-                formState.inputValues.imageUrl
-            ));
-        } else {
-            dispatch(productsActions.createProduct(
-                formState.inputValues.title,
-                formState.inputValues.description,
-                formState.inputValues.imageUrl,
-                +formState.inputValues.price
-            ));
-        }
+        setIsLoading(true);
+        setError(null);
 
-        navigation.goBack();
+        try {
+            if (editedProduct) {
+                await dispatch(productsActions.updateProduct(
+                    prodId,
+                    formState.inputValues.title,
+                    formState.inputValues.description,
+                    formState.inputValues.imageUrl
+                ));
+            } else {
+                await dispatch(productsActions.createProduct(
+                    formState.inputValues.title,
+                    formState.inputValues.description,
+                    formState.inputValues.imageUrl,
+                    +formState.inputValues.price
+                ));
+            }
+
+            navigation.goBack();
+        } catch (err) {
+            setError(err.message);
+        }
+        setIsLoading(false);
     }, [
         dispatch,
         prodId,
@@ -95,8 +113,7 @@ const EditProductScreen = ({ navigation }) => {
         navigation.setParams({
             submit: submitHandler
         });
-    }, [submitHandler])
-
+    }, [submitHandler]);
 
     const inputChangeHandler = useCallback((inputIdentifier, inputValue, inputValidity) => {
        dispatchFormState({
@@ -106,6 +123,14 @@ const EditProductScreen = ({ navigation }) => {
            input: inputIdentifier
        });
     }, [dispatchFormState]);
+
+    if (isLoading) {
+        return (
+            <View style={styles.loader}>
+                <ActivityIndicator size="large" color={Colors.primary} />
+            </View>
+        )
+    }
 
     return (
         <ScrollView>
@@ -186,6 +211,11 @@ EditProductScreen.navigationOptions = navData => {
 const styles = StyleSheet.create({
     form: {
         margin: 20
+    },
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });
 
