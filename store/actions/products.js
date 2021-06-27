@@ -9,6 +9,11 @@ export const fetchProducts = () => {
     return async dispatch => {
         try {
             const res = await fetch('https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products.json');
+
+            if (!res.ok) {
+                throw new Error('Something went wrong!');
+            }
+
             const data = await res.json();
             const loadedProducts = [];
 
@@ -31,6 +36,7 @@ export const fetchProducts = () => {
             });
         } catch(err) {
             console.error(error);
+            throw err;
         }
     }
 };
@@ -71,7 +77,9 @@ export const createProduct = (title, description, imageUrl, price) => {
                 }
             });
         } catch(err) {
-            console.error(error);
+            console.error(err);
+            throw err;
+
         }
     }
 };

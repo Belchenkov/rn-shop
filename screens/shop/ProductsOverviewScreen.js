@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { Button, FlatList, Platform, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
+import { Button, FlatList, Platform, StyleSheet, ActivityIndicator, View, Text } from 'react-native';
 
 import Colors from "../../constants/Colors";
 import ProductItem from "../../components/shop/ProductItem";
@@ -10,6 +10,8 @@ import * as cartAction from '../../store/actions/cart';
 import * as productsAction from '../../store/actions/products';
 
 const ProductsOverviewScreen = ({ navigation }) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
     const products = useSelector(state => state.products.availableProducts);
     const dispatch = useDispatch();
 
@@ -20,9 +22,50 @@ const ProductsOverviewScreen = ({ navigation }) => {
         });
     };
 
+    const loadProducts = useCallback(async () => {
+        setError(null);
+        setIsLoading(true);
+        try {
+            await dispatch(productsAction.fetchProducts());
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [dispatch, setError, setIsLoading]);
+
     useEffect(() => {
-        dispatch(productsAction.fetchProducts());
-    }, [dispatch]);
+        loadProducts();
+    }, [dispatch, loadProducts]);
+
+    if (error) {
+        return (
+            <View style={styles.loader}>
+                <Text>An error occurred!</Text>
+                <Button
+                    title="Try again"
+                    onPress={loadProducts}
+                    color={Colors.primary}
+                />
+            </View>
+        )
+    }
+
+    if (isLoading) {
+        return (
+            <View style={styles.loader}>
+                <ActivityIndicator size="large" color={Colors.primary} />
+            </View>
+        )
+    }
+
+    if (!isLoading && products.length === 0 ) {
+        return (
+            <View style={styles.loader}>
+                <Text>No products found.</Text>
+            </View>
+        )
+    }
 
     return (
         <FlatList
@@ -86,6 +129,11 @@ ProductsOverviewScreen.navigationOptions = navData => {
 const styles = StyleSheet.create({
     button: {
         borderRadius: 20
+    },
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });
 
