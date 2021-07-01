@@ -1,4 +1,3 @@
-import PRODUCTS from "../../data/dummy-data";
 import {
     DELETE_PRODUCT,
     CREATE_PRODUCT,
@@ -9,7 +8,7 @@ import Product from "../../models/Product";
 
 const initialState = {
     availableProducts: [],
-    userProducts: PRODUCTS.filter(prod => prod.ownerId === 'u1')
+    userProducts: []
 };
 
 export default (state = initialState, action) => {
