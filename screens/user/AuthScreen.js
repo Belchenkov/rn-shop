@@ -7,7 +7,7 @@ import Input from "../../components/UI/Input";
 import Card from "../../components/UI/Card";
 import Colors from "../../constants/Colors";
 
-import { signUp } from "../../store/actions/auth";
+import { login, signUp } from "../../store/actions/auth";
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 
@@ -34,15 +34,9 @@ const formReducer = (state, action) => {
     return state;
 };
 
-const AuthScreen = (props) => {
+const AuthScreen = () => {
+    const [isSignup, setIsSignup] = useState(false);
     const dispatch = useDispatch();
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState();
-
-    const prodId = props.navigation.getParam('productId');
-    const editedProduct = useSelector(state =>
-        state.products.userProducts.find(prod => prod.id === prodId)
-    );
 
     const [formState, dispatchFormState] = useReducer(formReducer, {
         inputValues: {
@@ -56,11 +50,22 @@ const AuthScreen = (props) => {
         formIsValid: false
     });
 
-    const signUpHandler = () => {
-        dispatch(signUp(
-            formState.inputValues.email,
-            formState.inputValues.password
-        ));
+    const authHandler = () => {
+        let action;
+
+        if (isSignup) {
+            action = signUp(
+                formState.inputValues.email,
+                formState.inputValues.password
+            );
+        } else {
+            action = login(
+                formState.inputValues.email,
+                formState.inputValues.password
+            );
+        }
+
+        dispatch(action);
     };
 
     const inputChangeHandler = useCallback(
@@ -113,15 +118,15 @@ const AuthScreen = (props) => {
                     </ScrollView>
                     <View style={styles.buttonContainer}>
                         <Button
-                            onPress={signUpHandler}
-                            title="Login"
+                            onPress={authHandler}
+                            title={ isSignup ? "Sign Up" : "Login"}
                             color={Colors.primary}
                         />
                     </View>
                     <View style={styles.buttonContainer}>
                         <Button
-                            onPress={() => {}}
-                            title="Switch to Sign Up"
+                            onPress={() => { setIsSignup(prevState => !prevState) }}
+                            title={ `Switch to ${isSignup ? 'Login' : 'Sign Up'}`}
                             color={Colors.accent}
                         />
                     </View>
