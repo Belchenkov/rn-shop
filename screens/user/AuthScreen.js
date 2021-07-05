@@ -1,6 +1,6 @@
-import React, { useCallback, useReducer, useState } from 'react';
-import { useDispatch, useSelector } from "react-redux";
-import { ScrollView, StyleSheet, Button, View } from 'react-native';
+import React, { useCallback, useReducer, useState, useEffect } from 'react';
+import { useDispatch } from "react-redux";
+import { ScrollView, StyleSheet, Button, View, ActivityIndicator, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import Input from "../../components/UI/Input";
@@ -35,6 +35,8 @@ const formReducer = (state, action) => {
 };
 
 const AuthScreen = () => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState();
     const [isSignup, setIsSignup] = useState(false);
     const dispatch = useDispatch();
 
@@ -50,7 +52,11 @@ const AuthScreen = () => {
         formIsValid: false
     });
 
-    const authHandler = () => {
+    useEffect(() => {
+        error && Alert.alert('An Error Occurred!', error, [{ text: 'Okay' }]);
+    }, [error]);
+
+    const authHandler = async () => {
         let action;
 
         if (isSignup) {
@@ -65,7 +71,17 @@ const AuthScreen = () => {
             );
         }
 
-        dispatch(action);
+        setError(null);
+        setIsLoading(true);
+
+        try {
+            await dispatch(action);
+
+        } catch (err) {
+            setError(err.message);
+        }
+
+        setIsLoading(false);
     };
 
     const inputChangeHandler = useCallback(
@@ -124,11 +140,14 @@ const AuthScreen = () => {
                         />
                     </View>
                     <View style={styles.buttonContainer}>
-                        <Button
-                            onPress={() => { setIsSignup(prevState => !prevState) }}
-                            title={ `Switch to ${isSignup ? 'Login' : 'Sign Up'}`}
-                            color={Colors.accent}
-                        />
+                        { isLoading
+                            ? <ActivityIndicator size="small" color={Colors.primary} />
+                            : <Button
+                                onPress={() => { setIsSignup(prevState => !prevState) }}
+                                title={ `Switch to ${isSignup ? 'Login' : 'Sign Up'}`}
+                                color={Colors.accent}
+                            />
+                        }
                     </View>
                 </Card>
             </LinearGradient>
