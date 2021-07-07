@@ -6,7 +6,9 @@ export const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
 export const SET_PRODUCTS = 'SET_PRODUCTS';
 
 export const fetchProducts = () => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+        const userId = getState().auth.userId;
+
         try {
             const res = await fetch('https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products.json');
 
@@ -32,7 +34,8 @@ export const fetchProducts = () => {
 
             dispatch({
                 type: SET_PRODUCTS,
-                products: loadedProducts
+                products: loadedProducts,
+                userProducts: loadedProducts.filter(prod => prod.ownerId === userId)
             });
         } catch(err) {
             console.error(error);
@@ -69,7 +72,8 @@ export const deleteProduct = productId => {
 export const createProduct = (title, description, imageUrl, price) => {
     return async (dispatch, getState) => {
         const token = getState().auth.token;
-        console.log(`https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=${token}`);
+        const userId = getState().auth.userId;
+
         try {
             const res = await fetch(
                 `https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=${token}`,
@@ -82,7 +86,8 @@ export const createProduct = (title, description, imageUrl, price) => {
                         title,
                         description,
                         imageUrl,
-                        price
+                        price,
+                        ownerId: userId
                     })
                 }
             );
@@ -100,7 +105,8 @@ export const createProduct = (title, description, imageUrl, price) => {
                     title,
                     description,
                     imageUrl,
-                    price
+                    price,
+                    ownerId: userId
                 }
             });
         } catch(err) {
