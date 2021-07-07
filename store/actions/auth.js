@@ -35,9 +35,11 @@ export const signUp = (email, password) => {
             }
 
             const data = await res.json();
-            console.log(data);
+
             dispatch({
-                type: SIGNUP
+                type: SIGNUP,
+                token: data.idToken,
+                userId: data.localId
             });
         } catch (error) {
             console.error(error);
@@ -82,9 +84,11 @@ export const login = (email, password) => {
             }
 
             const data = await res.json();
-            console.log(data);
+
             dispatch({
-                type: LOGIN
+                type: LOGIN,
+                token: data.idToken,
+                userId: data.localId
             });
         } catch (error) {
             console.error(error);

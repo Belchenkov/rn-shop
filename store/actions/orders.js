@@ -38,21 +38,25 @@ export const fetchOrders = () => {
 };
 
 export const addOrder = (cartItems, totalAmount) => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+        const token = getState().auth.token;
         const date = new Date();
 
         try {
-            const res = await fetch('https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/orders.json', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    cartItems,
-                    totalAmount,
-                    date: date.toISOString()
-                })
-            });
+            const res = await fetch(
+                `https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/orders.json?auth=${token}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        cartItems,
+                        totalAmount,
+                        date: date.toISOString()
+                    })
+                }
+            );
 
             if (!res.ok) {
                 throw new Error('Something went wrong!');

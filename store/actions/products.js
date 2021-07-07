@@ -42,11 +42,14 @@ export const fetchProducts = () => {
 };
 
 export const deleteProduct = productId => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+        const token = getState().auth.token;
+
         try {
-            const res = await fetch(`https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products/${productId}.json`, {
-                method: 'DELETE'
-            });
+            const res = await fetch(
+                `https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products/${productId}.json?auth=${token}`,
+                { method: 'DELETE' }
+            );
 
             if (!res.ok) {
                 throw new Error('Something went wrong!');
@@ -64,20 +67,25 @@ export const deleteProduct = productId => {
 };
 
 export const createProduct = (title, description, imageUrl, price) => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+        const token = getState().auth.token;
+        console.log(`https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=${token}`);
         try {
-            const res = await fetch('https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products.json', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    title,
-                    description,
-                    imageUrl,
-                    price
-                })
-            });
+            const res = await fetch(
+                `https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=${token}`,
+                    {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title,
+                        description,
+                        imageUrl,
+                        price
+                    })
+                }
+            );
 
             if (!res.ok) {
                 throw new Error('Something went wrong!');
@@ -103,19 +111,24 @@ export const createProduct = (title, description, imageUrl, price) => {
 };
 
 export const updateProduct = (id, title, description, imageUrl) => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+        const token = getState().auth.token;
+
         try {
-             const res = await fetch(`https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products/${id}.json`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    title,
-                    description,
-                    imageUrl
-                })
-            });
+             const res = await fetch(
+                 `https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products/${id}.json?auth=${token}`,
+                 {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title,
+                        description,
+                        imageUrl
+                    })
+                }
+            );
 
             if (!res.ok) {
                 throw new Error('Something went wrong!');
