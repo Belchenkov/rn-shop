@@ -1,5 +1,14 @@
-export const SIGNUP = 'SIGNUP';
-export const LOGIN = 'LOGIN';
+import { AsyncStorage } from "react-native";
+
+export const AUTHENTICATE = 'AUTHENTICATE';
+
+export const authenticate = (userId, token) => {
+    return {
+        type: AUTHENTICATE,
+        userId,
+        token
+    };
+};
 
 export const signUp = (email, password) => {
 
@@ -34,13 +43,13 @@ export const signUp = (email, password) => {
                 throw new Error(message);
             }
 
-            const data = await res.json();
+            const { idToken, localId, expiresIn } = await res.json();
 
-            dispatch({
-                type: SIGNUP,
-                token: data.idToken,
-                userId: data.localId
-            });
+            dispatch(authenticate(idToken, localId));
+
+            // Save to AsyncLS
+            const expirationDate = new Date(new Date().getTime() + parseInt(expiresIn) * 1000).toISOString();
+            saveDataToStorage(idToken, localId, expirationDate);
         } catch (error) {
             console.error(error);
             throw error;
@@ -83,16 +92,24 @@ export const login = (email, password) => {
                 throw new Error(message);
             }
 
-            const data = await res.json();
+            const { idToken, localId, expiresIn } = await res.json();
 
-            dispatch({
-                type: LOGIN,
-                token: data.idToken,
-                userId: data.localId
-            });
+            dispatch(authenticate(idToken, localId));
+
+            // Save to AsyncLS
+            const expirationDate = new Date(new Date().getTime() + parseInt(expiresIn) * 1000);
+            saveDataToStorage(idToken, localId, expirationDate);
         } catch (error) {
             console.error(error);
             throw error;
         }
     };
+};
+
+const saveDataToStorage = (token, userId, expirationDate) => {
+    AsyncStorage.setItem('userData', JSON.stringify({
+        token,
+        userId,
+        expiryDate: expirationDate.toISOString()
+    }));
 };
