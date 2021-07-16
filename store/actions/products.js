@@ -6,7 +6,9 @@ export const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
 export const SET_PRODUCTS = 'SET_PRODUCTS';
 
 export const fetchProducts = () => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+        const userId = getState().auth.userId;
+
         try {
             const res = await fetch('https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products.json');
 
@@ -21,7 +23,7 @@ export const fetchProducts = () => {
                 loadedProducts.push(
                     new Product(
                         key,
-                        'u1',
+                        data[key].ownerId,
                         data[key].title,
                         data[key].imageUrl,
                         data[key].description,
@@ -32,7 +34,8 @@ export const fetchProducts = () => {
 
             dispatch({
                 type: SET_PRODUCTS,
-                products: loadedProducts
+                products: loadedProducts,
+                userProducts: loadedProducts.filter(prod => prod.ownerId === userId)
             });
         } catch(err) {
             console.error(error);
@@ -42,11 +45,14 @@ export const fetchProducts = () => {
 };
 
 export const deleteProduct = productId => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+        const token = getState().auth.token;
+
         try {
-            const res = await fetch(`https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products/${productId}.json`, {
-                method: 'DELETE'
-            });
+            const res = await fetch(
+                `https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products/${productId}.json?auth=${token}`,
+                { method: 'DELETE' }
+            );
 
             if (!res.ok) {
                 throw new Error('Something went wrong!');
@@ -64,20 +70,27 @@ export const deleteProduct = productId => {
 };
 
 export const createProduct = (title, description, imageUrl, price) => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+        const token = getState().auth.token;
+        const userId = getState().auth.userId;
+
         try {
-            const res = await fetch('https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products.json', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    title,
-                    description,
-                    imageUrl,
-                    price
-                })
-            });
+            const res = await fetch(
+                `https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=${token}`,
+                    {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title,
+                        description,
+                        imageUrl,
+                        price,
+                        ownerId: userId
+                    })
+                }
+            );
 
             if (!res.ok) {
                 throw new Error('Something went wrong!');
@@ -92,7 +105,8 @@ export const createProduct = (title, description, imageUrl, price) => {
                     title,
                     description,
                     imageUrl,
-                    price
+                    price,
+                    ownerId: userId
                 }
             });
         } catch(err) {
@@ -103,19 +117,24 @@ export const createProduct = (title, description, imageUrl, price) => {
 };
 
 export const updateProduct = (id, title, description, imageUrl) => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+        const token = getState().auth.token;
+
         try {
-             const res = await fetch(`https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products/${id}.json`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    title,
-                    description,
-                    imageUrl
-                })
-            });
+             const res = await fetch(
+                 `https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/products/${id}.json?auth=${token}`,
+                 {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title,
+                        description,
+                        imageUrl
+                    })
+                }
+            );
 
             if (!res.ok) {
                 throw new Error('Something went wrong!');

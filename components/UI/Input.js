@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   label: {
-    fontFamily: 'work-sans-bold',
+    fontFamily: 'work-bold',
     marginVertical: 8
   },
   input: {
