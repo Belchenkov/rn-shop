@@ -16,7 +16,6 @@ export const fetchOrders = () => {
 
             const data = await res.json();
             const loadedOrders = [];
-
             for(const key in data) {
                 loadedOrders.push(
                     new Order(
@@ -45,6 +44,7 @@ export const addOrder = (cartItems, totalAmount) => {
         const userId = getState().auth.userId;
         const date = new Date();
 
+        console.log(token, 'token')
         try {
             const res = await fetch(
                 `https://rn-shop-9e0e8-default-rtdb.europe-west1.firebasedatabase.app/orders/${userId}.json?auth=${token}`,
