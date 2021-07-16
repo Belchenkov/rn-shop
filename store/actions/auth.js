@@ -3,16 +3,20 @@ import { AsyncStorage } from "react-native";
 export const AUTHENTICATE = 'AUTHENTICATE';
 export const LOGOUT = 'LOGOUT';
 
-export const authenticate = (userId, token) => {
-    return {
-        type: AUTHENTICATE,
-        userId,
-        token
+let timer;
+
+export const authenticate = (token, userId, expiryTime) => {
+    return dispatch => {
+        dispatch(setLogoutTimer(expiryTime));
+        dispatch({
+            type: AUTHENTICATE,
+            userId,
+            token
+        });
     };
 };
 
 export const signUp = (email, password) => {
-
     return async dispatch => {
         try {
             const res = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBYLVY68nnRmENWr6-gdNGa6_sjBCBtG60', {
@@ -46,7 +50,7 @@ export const signUp = (email, password) => {
 
             const { idToken, localId, expiresIn } = await res.json();
 
-            dispatch(authenticate(idToken, localId));
+            dispatch(authenticate(idToken, localId, parseInt(expiresIn) * 1000));
 
             // Save to AsyncLS
             const expirationDate = new Date(new Date().getTime() + parseInt(expiresIn) * 1000).toISOString();
@@ -95,7 +99,7 @@ export const login = (email, password) => {
 
             const { idToken, localId, expiresIn } = await res.json();
 
-            dispatch(authenticate(idToken, localId));
+            dispatch(authenticate(idToken, localId, parseInt(expiresIn) * 1000));
 
             // Save to AsyncLS
             const expirationDate = new Date(new Date().getTime() + parseInt(expiresIn) * 1000);
@@ -108,9 +112,22 @@ export const login = (email, password) => {
 };
 
 export const logout = () => {
-    return {
-        type: LOGOUT
-    }
+    clearLogoutTimer();
+    AsyncStorage.removeItem('userData');
+
+    return { type: LOGOUT };
+};
+
+const clearLogoutTimer = () => {
+    if (timer) clearTimeout(timer);
+};
+
+const setLogoutTimer = expirationTime => {
+    return dispatch => {
+        timer = setTimeout(() => {
+            dispatch(logout());
+        }, expirationTime);
+    };
 };
 
 const saveDataToStorage = (token, userId, expirationDate) => {
