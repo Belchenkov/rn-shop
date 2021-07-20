@@ -1,12 +1,40 @@
 {
-  "name": "rn-shop2",
-  "displayName": "rn-shop2",
   "expo": {
-    "name": "rn-shop2",
-    "slug": "rn-shop2",
+    "name": "RN: Shop",
+    "slug": "rn-shop",
+    "privacy": "public",
+    "sdkVersion": "39.0.0",
+    "platforms": [
+      "android",
+      "ios"
+    ],
     "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#242832"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.belchenkov.rn-shop",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "package": "com.belchenkov.rn_shop",
+      "versionCode": 1,
+      "permissions": [
+        "CAMERA",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "description": "Build Shop App on React Native"
   }
 }
