@@ -30,7 +30,6 @@ export const signUp = (email, password) => {
                     returnSecureToken: true
                 })
             });
-
             if (! res.ok) {
                 const errorData = await res.json();
                 const errorId = errorData.error.message;
@@ -134,6 +133,6 @@ const saveDataToStorage = (token, userId, expirationDate) => {
     AsyncStorage.setItem('userData', JSON.stringify({
         token,
         userId,
-        expiryDate: expirationDate.toISOString()
+        expiryDate: expirationDate
     }));
 };
